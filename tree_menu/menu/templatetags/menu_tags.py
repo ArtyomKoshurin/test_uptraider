@@ -4,7 +4,6 @@ from django.utils.safestring import mark_safe
 
 from menu.models import Menu, MenuItem
 
-
 register = template.Library()
 
 
@@ -12,15 +11,15 @@ register = template.Library()
 def draw_menu(context, menu_name=None):
     request = context['request']
     current_url = request.path
+
     menus = Menu.objects.filter(
         name=menu_name
     ) if menu_name else Menu.objects.all()
 
     if not menus.exists():
-        return ""
+        return f"Меню с именем '{menu_name}' не найдено в базе данных." if menu_name else "В базе данных нет меню."
 
     def render_menu(menu):
-
         all_items = MenuItem.objects.filter(menu=menu).select_related('parent')
         children_map = {}
         for item in all_items:
@@ -32,17 +31,14 @@ def draw_menu(context, menu_name=None):
                 return False
             if current_url == '/':
                 return item_url == '/' or item_url == ''
-
             return current_url == item_url or current_url.startswith(
                 item_url + '/'
             )
 
         def find_active_item():
-
             for item in all_items:
                 if is_active(item):
                     return item
-
             try:
                 resolved = resolve(current_url)
                 for item in all_items:
@@ -57,12 +53,10 @@ def draw_menu(context, menu_name=None):
         first_level_children = set()
 
         if active_item:
-
             item = active_item
             while item:
                 active_branch_ids.add(item.id)
                 item = item.parent
-
             for child in children_map.get(active_item.id, []):
                 first_level_children.add(child.id)
 
@@ -75,12 +69,14 @@ def draw_menu(context, menu_name=None):
                 in_active_branch = item.id in active_branch_ids
                 is_first_level_child = item.id in first_level_children
 
-                should_expand = is_item_active or in_active_branch or is_first_level_child
+                should_expand = (
+                    in_active_branch and not is_item_active
+                ) or is_first_level_child or (not active_item and level == 0)
 
-                css_class = "active" if is_item_active else "open" if in_active_branch or is_first_level_child else ""
+                css_class = "active" if is_item_active else "open" if should_expand else ""
                 html += f'<li class="{css_class}"><a href="{item.get_url()}">{item.title}</a>'
 
-                if should_expand or not active_item:
+                if should_expand:
                     html += render_items(item.id, level + 1)
                 html += '</li>'
             html += '</ul>'
