@@ -26,12 +26,12 @@ class MenuItem(models.Model):
     named_url = models.CharField(
         max_length=100,
         blank=True,
-        help_text="URL, необходимый для реверса"
+        help_text="Имя URL-шаблона"
     )
     custom_url = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Кастомный URL"
+        help_text="Явный URL"
     )
 
     def __str__(self):

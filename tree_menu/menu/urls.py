@@ -1,10 +1,10 @@
 from django.urls import path
 
-from menu import views
+from menu.views import home_view
 
 
 app_name = "menu"
 
 urlpatterns = [
-    path('', views.home_view, name='home'),
+    path('', home_view, name='home'),
 ]
