@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load menu_tags %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<h2>Добро пожаловать на главную страницу!</h2>
+
+<nav>
+    {% draw_menu 'main_menu' %}
+</nav>
+
+{% endblock %}
