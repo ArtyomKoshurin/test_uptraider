@@ -6,8 +6,18 @@
 {% block content %}
 <h2>Добро пожаловать на главную страницу!</h2>
 
+<form method="get" class="mb-3">
+    <label for="menu_name">Выберите меню:</label>
+    <input type="text" name="menu" id="menu_name" value="{{ request.GET.menu }}">
+    <button type="submit">Показать</button>
+</form>
+
+<form method="get" class="mb-3">
+    <button type="submit" class="btn btn-secondary">Показать все</button>
+</form>
+
 <nav>
-    {% draw_menu 'main_menu' %}
+    {% draw_menu request.GET.menu %}
 </nav>
 
 {% endblock %}
